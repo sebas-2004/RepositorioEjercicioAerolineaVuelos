@@ -1,69 +1,87 @@
+const readlineSync = require('readline-sync');
+
 class Vuelo {
-    constructor(origen, destino, costo, impuesto, costoMascota = 0, esPromocion = false) {
-        this.origen = origen;
+    constructor(destino, origen, costo) {
         this.destino = destino;
+        this.origen = origen;
         this.costo = costo;
-        this.impuesto = impuesto;
-        this.costoMascota = costoMascota;
-        this.esPromocion = esPromocion;
+        this.pasajeros = [];
     }
 
-    calcularCostoFinal() {
-        let costoFinal = this.costo + (this.costo * this.impuesto);
-        if (this.esPromocion) {
-            costoFinal -= costoFinal * 0.10;
-        }
-        return costoFinal + this.costoMascota;
+    agregarPasajero(pasajero) {
+        this.pasajeros.push(pasajero);
     }
 }
 
-class Aerolinea {
-    constructor() {
-        this.vuelos = [];
-        this.infantes = 0;
-        this.costoDulces = 0;
-        this.destinos = {};
-        this.recaudacionMascotas = 0;
-    }
-
-    agregarVuelo(vuelo) {
-        this.vuelos.push(vuelo);
-        this.destinos[vuelo.destino] = (this.destinos[vuelo.destino] || 0) + 1;
-        this.recaudacionMascotas += vuelo.costoMascota;
-    }
-
-    agregarInfante() {
-        this.infantes++;
-        this.costoDulces += 10; 
-    }
-
-    calcularRecaudacion() {
-        let total = 0;
-        for (let vuelo of this.vuelos) {
-            total += vuelo.calcularCostoFinal();
-        }
-        return total;
-    }
-
-    calcularImpuestosPorDestino(destino) {
-        let total = 0;
-        for (let vuelo of this.vuelos) {
-            if (vuelo.destino === destino) {
-                total += vuelo.costo * vuelo.impuesto;
-            }
-        }
-        return total;
-    }
-
-    destinoPreferido() {
-        let max = 0;
-        let destinoPreferido = '';
-        for (let destino in this.destinos) {
-            if (this.destinos[destino] > max) {
-                max = this.destinos[destino];
-                destinoPreferido = destino;
-            }
-        }
-        return destinoPreferido;
+class Pasajero {
+    constructor(nombre, edad) {
+        this.nombre = nombre;
+        this.edad = edad;
     }
 }
+
+// Ejemplo de uso:
+const vuelo1 = new Vuelo('San Andrés', 'Bogotá', 500000);
+const vuelo2 = new Vuelo('Cartagena', 'Medellín', 400000);
+
+const vuelos = [vuelo1, vuelo2];
+
+const totalRecaudado = vuelos.reduce((total, vuelo) => total + vuelo.costo, 0);
+console.log(`Valor total recaudado: $${totalRecaudado}`);
+const destinosFrecuentes = {};
+
+vuelos.forEach((vuelo) => {
+    if (destinosFrecuentes[vuelo.destino]) {
+        destinosFrecuentes[vuelo.destino]++;
+    } else {
+        destinosFrecuentes[vuelo.destino] = 1;
+    }
+});
+
+const destinoPreferido = Object.keys(destinosFrecuentes).reduce((a, b) =>
+    destinosFrecuentes[a] > destinosFrecuentes[b] ? a : b
+);
+
+console.log(`Destino preferido: ${destinoPreferido}`);
+class Vuelo {
+    constructor(destino, origen, costo, mascotas) {
+        this.destino = destino;
+        this.origen = origen;
+        this.costo = costo;
+        this.mascotas = mascotas;
+    }
+
+    calcularImpuestosMascotas() {
+        // Lógica para calcular impuestos por mascotas
+        // (puede variar según las reglas de la aerolínea)
+    }
+}
+
+// Ejemplo de uso:
+const vueloConMascotas = new Vuelo('San Andrés', 'Bogotá', 500000, 2);
+const vueloSinMascotas = new Vuelo('Cartagena', 'Medellín', 400000, 0);
+
+const totalImpuestosMascotas = vueloConMascotas.calcularImpuestosMascotas() + vueloSinMascotas.calcularImpuestosMascotas();
+console.log(`Dinero recaudado por transporte de mascotas: $${totalImpuestosMascotas}`);
+class Vuelo {
+    constructor(destino, origen, costo, pasajeros) {
+        this.destino = destino;
+        this.origen = origen;
+        this.costo = costo;
+        this.pasajeros = pasajeros;
+    }
+
+    contarInfantes() {
+        return this.pasajeros.filter((pasajero) => pasajero.edad <= 12).length;
+    }
+}
+
+// Ejemplo de uso:
+const pasajero1 = new Pasajero('Juan', 5);
+const pasajero2 = new Pasajero('María', 30);
+
+const vueloInfantes = new Vuelo('San Andrés', 'Bogotá', 500000, [pasajero1, pasajero2]);
+
+const cantidadInfantes = vueloInfantes.contarInfantes();
+console.log(`Cantidad de infantes: ${cantidadInfantes}`);
+
